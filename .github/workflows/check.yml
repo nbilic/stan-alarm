@@ -1,0 +1,49 @@
+name: check
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+# Never run two checks at once, otherwise both could notify about the same listing.
+concurrency:
+  group: check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install curl-impersonate
+        run: |
+          mkdir -p "$RUNNER_TEMP/ci"
+          curl -sL https://github.com/lexiforest/curl-impersonate/releases/download/v2.2.3/curl-impersonate-v2.2.3.x86_64-linux-gnu.tar.gz | tar xz -C "$RUNNER_TEMP/ci"
+          echo "CURL_IMPERSONATE_BIN=$RUNNER_TEMP/ci/curl-impersonate" >> "$GITHUB_ENV"
+
+      # State (seen listing ids) lives in the Actions cache. Caches are immutable, so each run
+      # restores the newest one by prefix and saves a new one under its own run id.
+      - name: Restore state
+        uses: actions/cache/restore@v4
+        with:
+          path: state
+          key: state-${{ github.run_id }}
+          restore-keys: state-
+
+      - name: Check for new listings
+        run: node src/main.mjs
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+
+      - name: Save state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: state
+          key: state-${{ github.run_id }}-${{ github.run_attempt }}

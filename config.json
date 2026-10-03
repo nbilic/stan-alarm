@@ -1,0 +1,26 @@
+{
+  "searches": [
+    {
+      "source": "njuskalo",
+      "url": "https://www.njuskalo.hr/prodaja-stanova/split?price%5Bmin%5D=120000&price%5Bmax%5D=300000&livingArea%5Bmin%5D=35"
+    },
+    {
+      "source": "index",
+      "pageUrl": "https://www.index.hr/oglasi/nekretnine/prodaja-stanova/split/pretraga",
+      "apiParams": {
+        "module": "real-estate",
+        "category": "flats-for-sale",
+        "sortOption": 4,
+        "includeCityIds": "52eb9db8-6dc1-4ed5-acf7-e1669df05240",
+        "priceFrom": 100000,
+        "priceTo": 320000,
+        "areaFrom": 40,
+        "itemPerPage": 24
+      }
+    },
+    {
+      "source": "nekretnine",
+      "url": "https://www.nekretnine.hr/prodaja-stambene-nekretnine/split/?criterio=data&ordine=desc&prezzoMinimo=160000&prezzoMassimo=300000&superficieMinima=40"
+    }
+  ]
+}
