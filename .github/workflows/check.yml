@@ -21,11 +21,25 @@ jobs:
         with:
           node-version: 22
 
+      # Cached so a run doesn't depend on GitHub's release downloads, which sometimes return 504
+      # for hours. On a miss, `gh release download` goes through the API, a separate path that kept
+      # working during such an outage.
+      - name: Restore curl-impersonate
+        id: ci-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/curl-impersonate
+          key: curl-impersonate-v2.2.3
+
       - name: Install curl-impersonate
+        if: steps.ci-cache.outputs.cache-hit != 'true'
         run: |
-          mkdir -p "$RUNNER_TEMP/ci"
-          curl -sL https://github.com/lexiforest/curl-impersonate/releases/download/v2.2.3/curl-impersonate-v2.2.3.x86_64-linux-gnu.tar.gz | tar xz -C "$RUNNER_TEMP/ci"
-          echo "CURL_IMPERSONATE_BIN=$RUNNER_TEMP/ci/curl-impersonate" >> "$GITHUB_ENV"
+          mkdir -p ~/curl-impersonate
+          gh release download v2.2.3 -R lexiforest/curl-impersonate -p 'curl-impersonate-v2.2.3.x86_64-linux-gnu.tar.gz' -O - | tar xz -C ~/curl-impersonate
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - run: echo "CURL_IMPERSONATE_BIN=$HOME/curl-impersonate/curl-impersonate" >> "$GITHUB_ENV"
 
       # State (seen listing ids) lives in the Actions cache. Caches are immutable, so each run
       # restores the newest one by prefix and saves a new one under its own run id.
