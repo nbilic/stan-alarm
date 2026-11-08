@@ -17,10 +17,6 @@
         "areaFrom": 40,
         "itemPerPage": 24
       }
-    },
-    {
-      "source": "nekretnine",
-      "url": "https://www.nekretnine.hr/prodaja-stambene-nekretnine/split/?criterio=data&ordine=desc&prezzoMinimo=160000&prezzoMassimo=300000&superficieMinima=40"
     }
   ]
 }
